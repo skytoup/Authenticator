@@ -99,7 +99,7 @@
 
 /* Begin PBXFileReference section */
 		1408126017A1E32C62F8EBB5 /* Pods-Watch Extension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Watch Extension.debug.xcconfig"; path = "Target Support Files/Pods-Watch Extension/Pods-Watch Extension.debug.xcconfig"; sourceTree = "<group>"; };
-		18226A78233FAA6300B10142 /* 验证器.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "验证器.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		18226A78233FAA6300B10142 /* Authenticator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Authenticator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18226A7B233FAA6300B10142 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		18226A7D233FAA6300B10142 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		18226A84233FAA6400B10142 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -195,7 +195,7 @@
 		18226A79233FAA6300B10142 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				18226A78233FAA6300B10142 /* 验证器.app */,
+				18226A78233FAA6300B10142 /* Authenticator.app */,
 				189248312342F9A3002DFDAA /* Authenticator.app */,
 				1892483D2342F9A4002DFDAA /* Watch Extension.appex */,
 				188C5CD923476C1D0024BECB /* AuthenticatorTests.xctest */,
@@ -339,7 +339,7 @@
 			);
 			name = Authenticator;
 			productName = GoogleAuthCode;
-			productReference = 18226A78233FAA6300B10142 /* 验证器.app */;
+			productReference = 18226A78233FAA6300B10142 /* Authenticator.app */;
 			productType = "com.apple.product-type.application";
 		};
 		188C5CD823476C1D0024BECB /* AuthenticatorTests */ = {
@@ -779,7 +779,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.Authenticator;
-				PRODUCT_NAME = "验证器";
+				PRODUCT_NAME = Authenticator;
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -800,7 +800,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.test.Authenticator;
-				PRODUCT_NAME = "验证器";
+				PRODUCT_NAME = Authenticator;
 				SWIFT_INCLUDE_PATHS = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;

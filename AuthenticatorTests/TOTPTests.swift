@@ -7,7 +7,7 @@
 //
 
 import XCTest
-import GoogleAuthCode
+import Authenticator
 
 class TOTPTests: XCTestCase {
 

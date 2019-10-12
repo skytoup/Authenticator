@@ -6,7 +6,7 @@
 //  Copyright © 2019 test. All rights reserved.
 //
 
-import GoogleAuthCode
+import Authenticator
 import XCTest
 
 class Base32Tests: XCTestCase {

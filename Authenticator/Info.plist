@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CFBundleDisplayName</key>
+	<string>验证器</string>
 	<key>NSCameraUsageDescription</key>
 	<string>授权相机访问权限, 扫描二维码</string>
 	<key>NSPhotoLibraryUsageDescription</key>
