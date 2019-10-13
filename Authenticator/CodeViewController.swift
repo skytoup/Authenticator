@@ -202,8 +202,8 @@ class CodeViewController: UIViewController {
         let editDoneBtn = UIButton(type: .custom)
         let editDoneBtnItem = UIBarButtonItem(customView: editDoneBtn)
 
-        manageBtn.setTitle("管理", for: .normal)
-        addBtn.setTitle("添加", for: .normal)
+        manageBtn.setImage(UIImage(systemName: "square.grid.2x2")?.withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
+        addBtn.setImage(UIImage(systemName: "plus")?.withTintColor(.label, renderingMode: .alwaysOriginal), for: .normal)
         editDoneBtn.setTitle("完成", for: .normal)
         [manageBtn, addBtn, editDoneBtn].forEach {
             $0.setTitleColor(.label, for: .normal)
@@ -250,18 +250,18 @@ class CodeViewController: UIViewController {
     }
     private func makeCellContextMenu(model: AuthModel) -> UIMenu {
         return UIMenu(title: "", children: [
-            UIAction(title: "复 制", handler: { [weak self] _ in
+            UIAction(title: "复 制", image: UIImage(systemName: "doc.on.doc"), handler: { [weak self] _ in
                 guard let ws = self else { return }
                 ws.copyCode(secretKey: model.secretKey)
                 HUD.showText(ws.view, text: "复制成功")
             }),
-            UIAction(title: "二维码", handler: { [weak self] _ in
+            UIAction(title: "二维码", image: UIImage(systemName: "qrcode"), handler: { [weak self] _ in
                 self?.present(UINavigationController(rootViewController: CodeQRViewController(model: model)), animated: true, completion: nil)
             }),
-            UIAction(title: "编 辑", handler: { [weak self] _ in
+            UIAction(title: "编 辑", image: UIImage(systemName: "pencil"), handler: { [weak self] _ in
                 self?.editCodeModel(model)
             }),
-            UIAction(title: "删 除", attributes: .destructive, handler: { [weak self] _ in
+            UIAction(title: "删 除", image: UIImage(systemName: "xmark"), attributes: .destructive, handler: { [weak self] _ in
                 self?.delCodeModel(model)
             })
         ])
