@@ -41,6 +41,7 @@
 		1892485823444B6A002DFDAA /* RealmDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1892485723444B6A002DFDAA /* RealmDB.swift */; };
 		1892485A2344A0BD002DFDAA /* CodeCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189248592344A0BD002DFDAA /* CodeCell.swift */; };
 		1892485E2345F4DF002DFDAA /* Base32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1892485D2345F4DF002DFDAA /* Base32.swift */; };
+		1894D5102352D82600ADFB4D /* CodeTableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1894D50F2352D82600ADFB4D /* CodeTableViewDataSource.swift */; };
 		18AA870E234A3EA900FF4F6A /* SafeDispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AA870D234A3EA900FF4F6A /* SafeDispatch.swift */; };
 		18AA8710234B6CCF00FF4F6A /* CodeQRViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18AA870F234B6CCF00FF4F6A /* CodeQRViewController.swift */; };
 		18CECD2023497A9E009B802A /* HUD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18CECD1F23497A9E009B802A /* HUD.swift */; };
@@ -133,6 +134,7 @@
 		1892485723444B6A002DFDAA /* RealmDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RealmDB.swift; sourceTree = "<group>"; };
 		189248592344A0BD002DFDAA /* CodeCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeCell.swift; sourceTree = "<group>"; };
 		1892485D2345F4DF002DFDAA /* Base32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base32.swift; sourceTree = "<group>"; };
+		1894D50F2352D82600ADFB4D /* CodeTableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTableViewDataSource.swift; sourceTree = "<group>"; };
 		18AA870D234A3EA900FF4F6A /* SafeDispatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafeDispatch.swift; sourceTree = "<group>"; };
 		18AA870F234B6CCF00FF4F6A /* CodeQRViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeQRViewController.swift; sourceTree = "<group>"; };
 		18CECD1F23497A9E009B802A /* HUD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUD.swift; sourceTree = "<group>"; };
@@ -215,6 +217,7 @@
 				18226A86233FAA6400B10142 /* LaunchScreen.storyboard */,
 				18226A89233FAA6400B10142 /* Info.plist */,
 				18226A8F233FBB2D00B10142 /* CodeViewController.swift */,
+				1894D50F2352D82600ADFB4D /* CodeTableViewDataSource.swift */,
 				189248282340A92D002DFDAA /* CodeEditViewController.swift */,
 				189248592344A0BD002DFDAA /* CodeCell.swift */,
 				18AA870F234B6CCF00FF4F6A /* CodeQRViewController.swift */,
@@ -569,6 +572,7 @@
 				1892485A2344A0BD002DFDAA /* CodeCell.swift in Sources */,
 				18AA870E234A3EA900FF4F6A /* SafeDispatch.swift in Sources */,
 				18AA8710234B6CCF00FF4F6A /* CodeQRViewController.swift in Sources */,
+				1894D5102352D82600ADFB4D /* CodeTableViewDataSource.swift in Sources */,
 				188C5CEA234835A00024BECB /* TOTPManager.swift in Sources */,
 				188C5CD2234718FF0024BECB /* Data+Base32.swift in Sources */,
 				1892482C2340DD6A002DFDAA /* Signal+String.swift in Sources */,

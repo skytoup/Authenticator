@@ -19,8 +19,11 @@ import swiftScan
 
 class CodeViewController: UIViewController {
     private let tbView = UITableView(frame: .zero, style: .plain)
+    private lazy var dataSource = CodeTableViewDataSource(tbView: tbView, cmiDelegate: self)
+    private var dataCount: Int {
+        dataSource.tableView(tbView, numberOfRowsInSection: 0)
+    }
     
-    private let cellData = MutableProperty<[AuthModel]>([])
     private let isSelectAll = MutableProperty<Bool>(false)
     private let timeProgressPip = Signal<Float, NoError>.pipe()
     
@@ -36,7 +39,7 @@ class CodeViewController: UIViewController {
         tbView.allowsSelection = true
         tbView.separatorStyle = .none
         tbView.register(CodeCell.self, forCellReuseIdentifier: "CodeCell")
-        tbView.dataSource = self
+        tbView.dataSource = dataSource
         tbView.delegate = self
         tbView.rowHeight = 97
         tbView.estimatedRowHeight = 97
@@ -75,6 +78,7 @@ class CodeViewController: UIViewController {
         }
         
         let tbViewEditingSignal = tbView.reactive.signal(for: \.isEditing).skipRepeats()
+
         tbView.reactive.reloadData <~ Signal.merge(
             tbViewEditingSignal.map { _ in () },
             TOTPManager.share.updateCodeSignal
@@ -85,24 +89,26 @@ class CodeViewController: UIViewController {
 
         editSelectBtn.reactive.controlEvents(.touchUpInside).throttle(0.5, on: QueueScheduler.main).observeValues { [weak self] _ in
             guard let ws = self else { return }
-            let dc = ws.cellData.value.count
+
             let didSelectRow = ws.tbView.indexPathsForSelectedRows ?? []
-            let allRow = (0..<dc).map { IndexPath(row: $0, section: 0) }
-            ws.tbView.performBatchUpdates({
-                if ws.isSelectAll.value {
-                    allRow.filter {
-                        didSelectRow.firstIndex(of: $0) != nil
-                    }.forEach {
-                        ws.tbView.deselectRow(at: $0, animated: true)
-                    }
-                } else {
-                    allRow.filter {
-                        didSelectRow.firstIndex(of: $0) == nil
-                    }.forEach {
-                        ws.tbView.selectRow(at: $0, animated: true, scrollPosition: .none)
-                    }
+            let allRow = (0..<ws.dataCount).map { IndexPath(row: $0, section: 0) }
+
+            if ws.isSelectAll.value {
+                allRow.filter {
+                    didSelectRow.firstIndex(of: $0) != nil
+                }.forEach {
+                    ws.tbView.deselectRow(at: $0, animated: true)
                 }
-            }, completion: nil)
+            } else {
+                allRow.filter {
+                    didSelectRow.firstIndex(of: $0) == nil
+                }.forEach {
+                    ws.tbView.selectRow(at: $0, animated: true, scrollPosition: .none)
+                }
+            }
+        }
+        dataSource.dataEditingDeleteSignal.observeValues {
+            editDelBtn.isEnabled = false
         }
         let tbViewRowSelectSignal = Signal.merge(
             tbView.reactive.trigger(for: #selector(UITableView.selectRow(at:animated:scrollPosition:))),
@@ -114,14 +120,15 @@ class CodeViewController: UIViewController {
             .filter { [weak tbView] in tbView?.isEditing ?? false }
             .map { [weak tbView] in tbView?.indexPathsForSelectedRows?.count ?? 0 }
         
-        isSelectAll <~ tbViewRowSelectCountSignal.map { [weak self] in $0 == self?.cellData.value.count ?? 0 }
+        isSelectAll <~ tbViewRowSelectCountSignal.map { [weak self] in $0 == self?.dataCount ?? 0 }
         reactive.signal(for: #selector(CodeViewController.tableView(_:didSelectRowAt:)))
             .throttle(0.8, on: QueueScheduler.main)
             .map { ($0[0] as? UITableView, $0[1] as? IndexPath) }
             .filter { !($0.0?.isEditing ?? true) }
             .observeValues { [weak self] in
-                guard let ws = self, let idx = $0.1 else { return }
-                ws.copyCode(secretKey: ws.cellData.value[idx.row].secretKey)
+                guard let ws = self, let idx = $0.1, let model = ws.dataSource.itemIdentifier(for: idx) else { return }
+                
+                ws.copyCode(secretKey: model.secretKey)
                 HUD.showText(ws.view, text: "复制成功")
                 $0.0?.deselectRow(at: idx, animated: true)
             }
@@ -132,12 +139,13 @@ class CodeViewController: UIViewController {
             .observeValues { [weak self] _ in
                 guard let ws = self else { return }
                 let models = (ws.tbView.indexPathsForSelectedRows ?? []).map {
-                    ws.cellData.value[$0.row]
+                    ws.dataSource.itemIdentifier(for: $0)!
                 }
                 ws.delMulCodeModel(models: models)
             }
+        
         let timeProgressPipInput = timeProgressPip.input
-        let cellDataZeroSignal = cellData.signal.skipRepeats().map { $0.count == 0 }
+        let cellDataZeroSignal = dataSource.dataChangeSignal.skipRepeats().map { $0.count == 0 }
         let progressSignal = timeProgressPip.output.observe(on: QueueScheduler.main)
         timeProgressView.reactive.isHidden <~ cellDataZeroSignal
         timeProgressView.reactive.progress <~ progressSignal
@@ -157,56 +165,22 @@ class CodeViewController: UIViewController {
         }
         var timerRunning = true
         cellDataZeroSignal.observeValues { [weak timer] in
-            guard $0 == timerRunning, let wsTimer = timer else {
+            guard $0 == timerRunning, let wTimer = timer else {
                 return
             }
             if $0 {
-                wsTimer.suspend()
-                timerRunning = false
+                wTimer.suspend()
             } else {
-                wsTimer.resume()
-                timerRunning = true
+                wTimer.resume()
             }
-        }
-        
-        let hud = HUD.showWaitText(view, text: "正在加载数据...")
-        let ntfTk = RealmDB.share.db?.objects(AuthModel.self)
-            .sorted(byKeyPath: "score")
-            .observe({ [weak self, weak hud] change in
-                hud?.hide(animated: true)
-                guard let ws = self else { return }
-
-                switch change {
-                case .update(let result, _, _, _):
-                    fallthrough
-                case .initial(let result):
-                    ws.cellData.swap(result.map { $0 })
-                    TOTPManager.share.secretKeys = ws.cellData.value.map { $0.secretKey }
-                case .error(let error):
-                    print("auth model observe error \(error.localizedDescription)")
-                }
-                
-                if case let .update(_, deletions, insertions, modifications) = change, deletions.count == 0 || insertions.count == 0 {
-                    if ws.tbView.isEditing && deletions.count != 0 {
-                        editDelBtn.isEnabled = false
-                    }
-                    
-                    ws.tbView.performBatchUpdates({
-                        ws.tbView.deleteRows(at: deletions.map({ IndexPath(row: $0, section: 0)}), with: .automatic)
-                        ws.tbView.insertRows(at: insertions.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
-                        ws.tbView.reloadRows(at: modifications.map({ IndexPath(row: $0, section: 0) }), with: .automatic)
-                    }, completion: nil)
-                }
-            })
-        tbView.reactive.lifetime.observeEnded {
-            ntfTk?.invalidate()
+            timerRunning = !$0
         }
         
         if WCSession.isSupported() {
             let wcs = WCSession.default
             wcs.delegate = self
             wcs.activate()
-            cellData.signal.skipRepeats().observeValues {
+            dataSource.dataChangeSignal.skipRepeats().observeValues {
                 let ds = $0.map {
                     $0.dictionaryWithValues(forKeys: ["account", "secretKey", "remark"])
                 }
@@ -295,22 +269,20 @@ class CodeViewController: UIViewController {
     private func cellSwipeActionsConfiguration(indexPath: IndexPath) -> UISwipeActionsConfiguration {
         return UISwipeActionsConfiguration(actions: [
             UIContextualAction(style: .normal, title: "编辑", handler: { [weak self] (_, _, actionPerformed) in
-                guard let ws = self else {
+                guard let ws = self, let model = ws.dataSource.itemIdentifier(for: indexPath) else {
                     actionPerformed(false)
                     return
                 }
-                let data = ws.cellData.value[indexPath.row]
-                ws.editCodeModel(data)
+                ws.editCodeModel(model)
                 actionPerformed(true)
             }),
             UIContextualAction(style: .destructive, title: "删除", handler: { [weak self] (_, _, actionPerformed) in
-                guard let ws = self else {
+                guard let ws = self, let model = ws.dataSource.itemIdentifier(for: indexPath) else {
                     actionPerformed(false)
                     return
                 }
                 
-                let data = ws.cellData.value[indexPath.row]
-                ws.delCodeModel(data)
+                ws.delCodeModel(model)
                 actionPerformed(true)
             })
         ])
@@ -406,22 +378,6 @@ class CodeViewController: UIViewController {
     private func manualAddModel() {
         showEditVC(CodeEditViewController(type: .add(account: "", secretKey: "", remark: "")))
     }
-    private func sortModel(from: Int, to: Int) {
-        guard from != to else { return }
-
-        let base = (to == 0 ? 0 : cellData.value[to].score) + 1
-        
-        try? RealmDB.share.db?.write {
-            cellData.value[from].score = base
-            
-            guard to + 1 != cellData.value.count else { return }
-            
-            let ajust = from - to > 0 ? 0 : 1
-            ((to + ajust)..<cellData.value.count).filter { $0 != from }.enumerated().forEach {
-                cellData.value[$1].score = base + $0 + 1
-            }
-        }
-    }
     private func delMulCodeModel(models: [AuthModel]) {
         guard models.count != 0 else { return }
         let msg: String
@@ -450,47 +406,12 @@ class CodeViewController: UIViewController {
     }
 }
 
-// MARK: - UITableViewDataSource
-extension CodeViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if cellData.value.count == 0 {
-            if tableView.backgroundView == nil {
-                let lb = UILabel()
-                lb.textColor = .label
-                lb.text = "点击右上角按钮, 可添加数据"
-                lb.font = UIFont.systemFont(ofSize: 18)
-                lb.textAlignment = .center
-                tableView.backgroundView = lb
-            }
-        } else {
-            tableView.backgroundView = nil
-        }
-        
-        return cellData.value.count
-    }
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        return tableView.dequeueReusableCell(withIdentifier: "CodeCell", for: indexPath)
-    }
-    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if cell.interactions.count == 0 {
-            cell.addInteraction(UIContextMenuInteraction(delegate: self))
-        }
-        (cell as? CodeCell)?.setAuthModel(model: cellData.value[indexPath.row], isEditing: tableView.isEditing)
-    }
-}
-
 // MARK: - UITableViewDelegate
 extension CodeViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) { }
     func tableView(_ tableView: UITableView, shouldBeginMultipleSelectionInteractionAt indexPath: IndexPath) -> Bool {
         tableView.isEditing = true
-        return true
-    }
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        sortModel(from: sourceIndexPath.row, to: destinationIndexPath.row)
-    }
-    func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
         return true
     }
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
@@ -501,8 +422,7 @@ extension CodeViewController: UITableViewDelegate {
 // MARK: - UIContextMenuInteractionDelegate
 extension CodeViewController: UIContextMenuInteractionDelegate {
     func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
-        guard !tbView.isEditing, let realLocation = interaction.view?.convert(location, to: tbView), let idx = tbView.indexPathForRow(at: realLocation) else { return nil }
-        let model = cellData.value[idx.row]
+        guard !tbView.isEditing, let realLocation = interaction.view?.convert(location, to: tbView), let idx = tbView.indexPathForRow(at: realLocation), let model = dataSource.itemIdentifier(for: idx) else { return nil }
         
         return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) { [weak self] _ -> UIMenu? in
             return self?.makeCellContextMenu(model: model)
@@ -536,15 +456,7 @@ extension CodeViewController: LBXScanViewControllerDelegate {
 }
 
 extension CodeViewController: WCSessionDelegate {
-    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        
-    }
-    
-    func sessionDidBecomeInactive(_ session: WCSession) {
-        
-    }
-    
-    func sessionDidDeactivate(_ session: WCSession) {
-        
-    }
+    func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) { }
+    func sessionDidBecomeInactive(_ session: WCSession) { }
+    func sessionDidDeactivate(_ session: WCSession) { }
 }
