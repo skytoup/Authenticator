@@ -11,6 +11,11 @@ import ReactiveSwift
 
 class CodeCell: UITableViewCell {
 
+    
+    public static var identifier: String {
+        return "CodeCell"
+    }
+    
     private static let placeholdCode = "--- ---"
     
     let accountLb = UILabel()
@@ -59,4 +64,5 @@ class CodeCell: UITableViewCell {
         remarkLb.text = hasRemark ? model.remark : "备注"
         remarkLb.textColor = hasRemark ? .label : .placeholderText
     }
+
 }
