@@ -6,100 +6,110 @@
 //  Copyright © 2019 test. All rights reserved.
 //
 
-import Result
-import ReactiveSwift
+import SwiftUI
+import CoreData
+import WatchConnectivity
 
-class TOTPManager {
+class TOTPManager: ObservableObject {
     struct CalType: OptionSet {
         var rawValue: UInt8
         
         static var current = CalType(rawValue: 1 << 0)
         static var next = CalType(rawValue: 1 << 1)
-        
     }
     
-    static let share = TOTPManager()
+    static let shared = TOTPManager()
     
-    var secretKeys: [String] {
-        get {
-            return secretKeysProperty.value
+    var secretKeys: [String] = [] {
+        didSet {
+            workQueue.async { [weak self] in
+                guard let ws = self else {
+                    return
+                }
+                let new = Set(ws.secretKeys).subtracting(oldValue)
+                if new.count != 0 {
+                    ws.calCode(tm: ws.currentTM, type: [.next, .current], secretKeys: Array(new))
+                }
+            }
         }
-        set {
-            secretKeysProperty.swap(newValue)
-        }
-    }
-    var updateCodeSignal: Signal<(), NoError> {
-        updateCodePip.output
     }
     
-    private let timer: Timer
-    private let workQueue = DispatchQueue(label: "TOTPWorker")
-    lazy private var currentCode = Dictionary<String, Int>()
-    lazy private var nextCode = Dictionary<String, Int>()
-    lazy private var currentTM = 0
-    
-    private let tmProperty = MutableProperty(Int(Date().timeIntervalSince1970) / 30)
-    private let secretKeysProperty = MutableProperty<[String]>([])
-    private let updateCodePip = Signal<(), NoError>.pipe()
+    fileprivate var timer: Timer?
+    fileprivate let workQueue = DispatchQueue(label: "TOTPWorker")
+    fileprivate(set) var currentCode = [String: Int]()
+    fileprivate var nextCode = [String: Int]()
+    fileprivate var currentTM = 0
     
     fileprivate init() {
-        timer = Timer(timeInterval: 0.3, repeats: true) { [weak tmProperty] _ in
-            tmProperty?.swap(Int(Date().timeIntervalSince1970) / 30)
+        // 定时检查时间
+        timer = Timer(timeInterval: 0.3, repeats: true) { [weak self] _ in
+            guard let ws = self else {
+                return
+            }
+            
+            let tm = Int(Date().timeIntervalSince1970) / 30
+            guard ws.currentTM != tm else {
+                return
+            }
+            
+            if ws.currentTM == tm - 1 {
+                ws.swapToNext(tm)
+            } else {
+                ws.calCode(tm: tm, type: [.current, .next], secretKeys: ws.secretKeys)
+            }
         }
         Thread { [weak self] in
-            guard let ws = self else { return }
-            RunLoop.current.add(ws.timer, forMode: .common)
+            guard let timer = self?.timer else {
+                return
+            }
+            RunLoop.current.add(timer, forMode: .common)
             RunLoop.current.run()
         }.start()
-        
-        tmProperty.signal.skipRepeats()
-            .observe(on: QueueScheduler(qos: .default, name: workQueue.label, targeting: workQueue))
-            .filter { [weak self] in (self?.currentTM ?? $0) != $0 }
-            .observeValues { [weak self] _ in
-                self?.swapNext()
-            }
-        secretKeysProperty.signal.skipRepeats().observeValues { [weak self] _ in
-            self?.calCode()
-        }
     }
     
     deinit {
-        timer.invalidate()
+        timer?.invalidate()
     }
     
-    func codeFrom(secretKey: String) -> Int? {
-        return currentCode[secretKey]
-    }
-    
-    private func calCode(_ calType: CalType = [.current, .next]) {
+    fileprivate func calCode(tm: Int, type: CalType, secretKeys: [String]) {
         workQueue.async { [weak self] in
-            guard let ws = self else { return }
-            let currentTM = ws.tmProperty.value
-            let nextTM = currentTM + 1
-
-            if calType.contains(.next) {
-                ws.secretKeys.forEach {
-                    if ws.nextCode[$0] == nil, let code = TOTP.genCode(secretKey: $0, tm: nextTM) {
-                        ws.nextCode[$0] = code
-                    }
-                }
+            guard let ws = self else {
+                return
             }
-            if calType.contains(.current) {
-                ws.secretKeys.forEach {
-                    if ws.currentCode[$0] == nil, let code = TOTP.genCode(secretKey: $0, tm: currentTM) {
-                        ws.currentCode[$0] = code
-                    }
-                }
-                ws.currentTM = currentTM
-                ws.updateCodePip.input.send(value: ())
+            
+            ws.currentTM = tm
+            if type.contains(.current) {
+                ws.cal(tm: tm, secretKeys: secretKeys, codes: &ws.currentCode, isCur: true)
+            }
+            if type.contains(.next) {
+                ws.cal(tm: tm + 1, secretKeys: secretKeys, codes: &ws.nextCode, isCur: false)
             }
         }
     }
     
-    private func swapNext() {
-        swap(&currentCode, &nextCode)
+    fileprivate func cal(tm: Int, secretKeys: [String], codes: inout [String: Int], isCur: Bool) {
+        let ds: [(String, Int)] = secretKeys.compactMap {
+            if let code = TOTP.genCode(secretKey: $0, tm: tm) {
+                return ($0, code)
+            }
+            return nil
+        }
+        DispatchQueue.main.sync {
+            ds.forEach {
+                codes[$0.0] = $0.1
+            }
+            if isCur {
+                objectWillChange.send()
+            }
+        }
+    }
+    
+    fileprivate func swapToNext(_ tm: Int) {
+        DispatchQueue.main.sync {
+            swap(&currentCode, &nextCode)
+            objectWillChange.send()
+        }
         nextCode.removeAll()
-        updateCodePip.input.send(value: ())
-        calCode([.next])
+        calCode(tm: tm, type: [.next], secretKeys: secretKeys)
     }
 }

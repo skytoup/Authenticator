@@ -9,9 +9,12 @@
 import Foundation
 
 extension Int {
-    var codeString: String {
-        var cs = String(format: "%06d", self)
+    var displayCodeString: String {
+        var cs = self.codeString
         cs.insert(" ", at: cs.index(cs.startIndex, offsetBy: 3))
         return cs
+    }
+    var codeString: String {
+        String(format: "%06d", self)
     }
 }

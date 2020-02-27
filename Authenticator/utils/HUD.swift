@@ -9,6 +9,19 @@
 import MBProgressHUD
 
 class HUD {
+    static func showTextOnWin(_ text: String, time: TimeInterval = 2) {
+        guard let win = UIApplication.shared.windows.first else {
+            return
+        }
+        Self.showText(win, text: text, time: time)
+    }
+    static func showWaitTextOnWin(_ text: String, time: TimeInterval = 2) -> MBProgressHUD? {
+        guard let win = UIApplication.shared.windows.first else {
+            return nil
+        }
+        return Self.showWaitText(win, text: text)
+    }
+    
     static func showText(_ view: UIView, text: String, time: TimeInterval = 2) {
         SafeDispatch.syncMain {
             let hud = _hud(view)

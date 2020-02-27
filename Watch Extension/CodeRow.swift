@@ -2,14 +2,29 @@
 //  CodeRow.swift
 //  Watch Extension
 //
-//  Created by skytoup on 2019/10/10.
-//  Copyright © 2019 test. All rights reserved.
+//  Created by skytoup on 2020/2/19.
+//  Copyright © 2020 test. All rights reserved.
 //
 
-import WatchKit
+import SwiftUI
 
-class CodeRow: NSObject {
-    @IBOutlet weak var accountLb: WKInterfaceLabel!
-    @IBOutlet weak var codeLb: WKInterfaceLabel!
-    @IBOutlet weak var remarkLb: WKInterfaceLabel!
+struct CodeCell: View {
+    var data: TOTP.Params
+    var code: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text(data.issuer)
+            Text(code)
+                .foregroundColor(.blue)
+                .font(.title)
+            Text(data.remark)
+        }.padding()
+    }
+}
+
+struct ACodeRow_Previews: PreviewProvider {
+    static var previews: some View {
+        CodeCell(data: ("name", "code", "remark"), code: "--- ---")
+    }
 }

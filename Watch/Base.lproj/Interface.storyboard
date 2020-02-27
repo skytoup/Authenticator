@@ -1,64 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14868" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="16092.1" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Qcm-Dr-gOw">
     <device id="watch38"/>
     <dependencies>
-        <deployment identifier="watchOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14824"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="14643"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16082.1"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="16012"/>
     </dependencies>
     <scenes>
-        <!--Code Interface Controller-->
-        <scene sceneID="aou-V4-d1y">
+        <!--Hosting Controller-->
+        <scene sceneID="iMQ-Ah-12o">
             <objects>
-                <controller id="AgC-eL-Hgc" customClass="CodeInterfaceController" customModule="Watch_Extension">
-                    <items>
-                        <group width="1" alignment="left" layout="vertical" id="CdO-Ws-7Nk">
-                            <items>
-                                <label alignment="center" text="-" id="8VH-TX-u7X"/>
-                                <table alignment="left" id="MfA-Io-gnR">
-                                    <items>
-                                        <tableRow identifier="CodeRow" id="aT8-5t-rn6" customClass="CodeRow" customModule="Watch_Extension">
-                                            <group key="rootItem" width="1" height="0.0" alignment="left" layout="vertical" id="E2K-OL-AJa">
-                                                <items>
-                                                    <label height="20" alignment="left" text="-" id="zIb-GU-BgS">
-                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                                    </label>
-                                                    <label height="35" alignment="left" text="-" id="myN-dw-G82">
-                                                        <color key="textColor" red="0.016804177310000001" green="0.19835099580000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                                        <fontDescription key="font" style="UICTFontTextStyleTitle1"/>
-                                                    </label>
-                                                    <label height="20" alignment="left" text="-" id="Hmh-YR-Knv">
-                                                        <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                                        <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
-                                                    </label>
-                                                </items>
-                                            </group>
-                                            <connections>
-                                                <outlet property="accountLb" destination="zIb-GU-BgS" id="tz0-aL-pUZ"/>
-                                                <outlet property="codeLb" destination="myN-dw-G82" id="feI-0U-SWR"/>
-                                                <outlet property="remarkLb" destination="Hmh-YR-Knv" id="I2b-uV-iQC"/>
-                                            </connections>
-                                        </tableRow>
-                                    </items>
-                                </table>
-                            </items>
-                        </group>
-                        <group width="1" alignment="left" hidden="YES" id="SEk-aS-m1A">
-                            <items>
-                                <label alignment="center" text="暂无数据, 请在手机的打开验证器, 自动同步或添加数据" numberOfLines="5" id="xUi-ZX-kvn"/>
-                            </items>
-                        </group>
-                    </items>
-                    <connections>
-                        <outlet property="contentGV" destination="CdO-Ws-7Nk" id="aj1-jz-AKT"/>
-                        <outlet property="progressLb" destination="8VH-TX-u7X" id="l0F-gG-jNA"/>
-                        <outlet property="tbView" destination="MfA-Io-gnR" id="TcR-vk-ebT"/>
-                        <outlet property="tipGV" destination="SEk-aS-m1A" id="nT6-9g-2zw"/>
-                    </connections>
-                </controller>
+                <hostingController id="Qcm-Dr-gOw" customClass="HostingController" customModule="Watch_Extension"/>
             </objects>
-            <point key="canvasLocation" x="34" y="31"/>
+            <point key="canvasLocation" x="34" y="-284"/>
         </scene>
     </scenes>
 </document>

@@ -49,21 +49,23 @@ public class Base32 {
     /// 拼接5 bit解码数据
     /// - Parameter data: 5 bit解码的数据
     private static func bit5Concat(data: Data) -> Data {
+        // datas, tmp bytes, bit offset
         let res = data.reduce(into: (ds: Data(), bs: initZeroBytes(count: 5), bitOffset: 0)) {
-            let byteOffset = $0.bitOffset / 8
-            let currentBitCount = Base32.byteOfbitSize[byteOffset]
-            let needBitCount = $0.bitOffset + 5
+            let byteOffset = $0.bitOffset / 8 // 当前5 byte位置
+            let currentBitCount = Base32.byteOfbitSize[byteOffset] // 当前byte的bit数
+            let needBitCount = $0.bitOffset + 5 // 所需要bit数
             let diffBitCount = currentBitCount - needBitCount
             
-            if diffBitCount < 0 {
+            if diffBitCount < 0 { // 超出当前byte情况
                 let leftBitCount = needBitCount - $0.bitOffset
                 let rightBitCount = -diffBitCount
                 $0.bs[byteOffset] += (($1 & Base32.bit5FrontAnd[leftBitCount - 1]) >> rightBitCount)
                 $0.bs[byteOffset + 1] += (($1 & Base32.bit5BackAnd[rightBitCount - 1]) << (8 - rightBitCount))
-            } else {
+            } else { // 当前字节位置足够
                 $0.bs[byteOffset] += ($1 << diffBitCount)
             }
             
+            // 5 byte数据已合并
             if needBitCount == 40 {
                 $0.ds.append(contentsOf: $0.bs)
                 $0.bs = initZeroBytes(count: 5)
@@ -73,6 +75,7 @@ public class Base32 {
             }
         }
         
+        // 拼接不足5 byte的数据
         if res.bitOffset != 0 {
             var ds = res.ds
             let bs = res.bs[0..<res.bitOffset/8].map { $0 }

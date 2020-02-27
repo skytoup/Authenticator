@@ -27,14 +27,14 @@ class TOTPTests: XCTestCase {
     
     func testParseURL() {
          let urls = [
-            "otpauth://totp/Google:test%40gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Google",
-            "otpauth://totp/Google%20test:%20test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Google%20test",
-            "otpauth://totp/test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Google%20test",
+            "otpauth://totp/Cloudflare:test%40gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Cloudflare",
+            "otpauth://totp/Cloudflare%20test:%20test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Cloudflare%20test",
+            "otpauth://totp/test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Cloudflare%20test",
         ]
         let datas = [
-            ("Google", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
-            ("Google test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
-            ("Google test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
+            ("Cloudflare", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
+            ("Cloudflare test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
+            ("Cloudflare test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
         ]
         
         let results = urls.map { try? TOTP.parseURL($0) }
@@ -48,12 +48,12 @@ class TOTPTests: XCTestCase {
     
     func testGenURL() {
         let datas = [
-            ("Google", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
-            ("Google test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
+            ("Cloudflare", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
+            ("Cloudflare test", "NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP", "test@gmail.com"),
         ]
         let urls = [
-            "otpauth://totp/Google:test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Google",
-            "otpauth://totp/Google%20test:test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Google%20test",
+            "otpauth://totp/Cloudflare:test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Cloudflare",
+            "otpauth://totp/Cloudflare%20test:test@gmail.com?secret=NRTFIVLCIRTEOOCKKEZW4YRVNZGVCZKP&issuer=Cloudflare%20test",
         ]
         
         let results = datas.map { TOTP.genURL($0) }

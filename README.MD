@@ -3,7 +3,9 @@
 
 由于`GoogleAuthenticator`没有导出功能, 而且在watch上也没有查看功能, 干脆自己实现一个
 
-纯Swift5.x实现, 操作体验良好, 界面极简
+纯Swift5.2实现, 操作体验良好, 界面极简
+
+SwiftUI改写了一遍, 放弃使用第三方数据库
 
 另外增加相册二维码导入、二维码导出、watchOS同步查看
 
@@ -20,8 +22,8 @@
 ## 需要
 
 - iOS 13.0+
-- watchOS 5.0+
-- Xcode 11.0+
+- watchOS 6.0+
+- Xcode 11.4 beta2+
 
 ## 安装
 
@@ -58,8 +60,6 @@
 ![](ScreenShot/watch_1.png)
 
 ## 鸣谢
-- [ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa)
-- [Realm](https://github.com/realm/realm-cocoa)
 - [IQKeyboardManager](https://github.com/hackiftekhar/IQKeyboardManager)
 - [MBProgressHUD](https://github.com/jdg/MBProgressHUD)
 - [swiftScan](https://github.com/MxABC/swiftScan)

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="16117.1" systemVersion="19C57" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
+    <entity name="Code" representedClassName="CodeModel" syncable="YES" codeGenerationType="class">
+        <attribute name="account" attributeType="String"/>
+        <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="remark" optional="YES" attributeType="String"/>
+        <attribute name="score" attributeType="Double" usesScalarValueType="YES"/>
+        <attribute name="secretKey" attributeType="String"/>
+    </entity>
+    <elements>
+        <element name="Code" positionX="-63" positionY="-18" width="128" height="118"/>
+    </elements>
+</model>

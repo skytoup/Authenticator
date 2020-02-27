@@ -40,11 +40,14 @@ public class TOTP {
         let key = _key.map { $0 }
         let data = time2Bytes(tm).map { $0 }
         
+        // 数据进行hmac sha1 hash
         let hmacSha1Result = UnsafeMutablePointer<CChar>.allocate(capacity: Int(CC_SHA1_DIGEST_LENGTH))
         CCHmac(CCHmacAlgorithm(kCCHmacAlgSHA1), key, key.count, data, data.count, hmacSha1Result)
         
+        // 数据取最后一位的后8 bit作为偏移
         let hashData = Data(bytesNoCopy: hmacSha1Result, count: Int(CC_SHA1_DIGEST_LENGTH), deallocator: .none)
         let offset = Int(hashData.last ?? 0) & 0x0F
+        // 取偏移和其后4 byte, 转为一个Int32, 再取后6位
         let num = hashData.subdata(in: offset..<offset+4).reduce(0) {
             ($0 << 8) | Int($1)
         } & Int(Int32.max) % 1000000
