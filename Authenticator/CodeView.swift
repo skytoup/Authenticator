@@ -12,74 +12,15 @@ import Combine
 import MBProgressHUD
 
 struct CodeView: View {
-    fileprivate enum CodeEditState {
-        case dismiss
-        case add(params: TOTP.Params? = nil)
-        case edit(code: CodeModel)
-        
-        var isShow: Bool {
-            get {
-                if case .dismiss = self {
-                    return false
-                } else {
-                    return true
-                }
-            }
-            set {
-                guard !newValue else {
-                    return
-                }
-                self = .dismiss
-            }
-        }
-        
-        var view: some View {
-            switch self {
-            case .dismiss:
-                fatalError("can not get view if state is .dismiss")
-            case .add(let params):
-                return CodeEditView(params: params)
-            case .edit(let code):
-                return CodeEditView(code: code)
-            }
-        }
-    }
-    
-    fileprivate enum CodeQRState {
-        case dismiss
-        case show(code: CodeModel)
-        
-        var isShow: Bool {
-            get {
-                if case .dismiss = self {
-                    return false
-                } else {
-                    return true
-                }
-            }
-            set {
-                guard !newValue else {
-                    return
-                }
-                self = .dismiss
-            }
-        }
-        
-        var view: some View {
-            switch self {
-            case .dismiss:
-                fatalError("can not get view if state is .dismiss")
-            case .show(let code):
-                return CodeQRView(code: code)
-            }
-        }
-    }
-    
     @Environment(\.managedObjectContext) fileprivate var moc
-    @FetchRequest(
-        entity: CodeModel.entity(),
-        sortDescriptors: [NSSortDescriptor(keyPath: \CodeModel.score, ascending: true)]
-    ) var codes: FetchedResults<CodeModel>
+    @FetchRequest(fetchRequest: Self.fr) var codes: FetchedResults<CodeModel>
+    
+    static var fr: NSFetchRequest<CodeModel> {
+        let req = NSFetchRequest<CodeModel>(entityName: CodeModel.name)
+        req.sortDescriptors = [NSSortDescriptor(keyPath: \CodeModel.score, ascending: true)]
+        req.fetchLimit = 1
+        return req
+    }
     
     @State fileprivate var isShowScanView = false
     @State fileprivate var isShowImgPickerView = false
@@ -87,18 +28,10 @@ struct CodeView: View {
     @State fileprivate var isShowManageSheet = false
     @State fileprivate var isShowAddSheet = false
     @State fileprivate var isEditting = false
-    @State fileprivate var codeSelection = Set<UUID?>()
-    
-    @State fileprivate var willDelCodes = [CodeModel]()
 
-    @ObservedObject var totpManager = TOTPManager.shared
+    @State fileprivate var kw = ""
     
-    @State fileprivate var codeEditState = CodeEditState.dismiss
-    @State fileprivate var codeQRState = CodeQRState.dismiss
-    
-    fileprivate var isCodeSelectAll: Bool {
-        codeSelection.count == codes.count
-    }
+    @State fileprivate var codeEditShowState = CodeEditShowState.dismiss
     
     @ViewBuilder
     fileprivate var leadingBarItems: some View {
@@ -107,15 +40,13 @@ struct CodeView: View {
         } else {
             Button(action: {
                 self.isShowManageSheet = true
-            }) {
-                Image(systemName: "square.grid.2x2")
-            }
+            }) { Image(systemName: "square.grid.2x2") }
             .padding([.trailing, .vertical], 15)
             .actionSheet(isPresented: $isShowAddSheet) { () -> ActionSheet in
                 ActionSheet(title: Text("添加验证码"), message: nil, buttons: [
                     .default(Text("扫描二维码"), action: { self.isShowScanView = true }),
                     .default(Text("相册选择"), action: { self.isShowImgPickerView = true }),
-                    .default(Text("手动输入"), action: { self.codeEditState = .add() }),
+                    .default(Text("手动输入"), action: { self.codeEditShowState = .add() }),
                     .cancel(Text("取消"))
                 ])
             }
@@ -134,7 +65,6 @@ struct CodeView: View {
         Button(action: {
             if self.isEditting {
                 self.isEditting = false
-                self.codeSelection.removeAll()
             } else {
                 self.isShowAddSheet = true
             }
@@ -154,93 +84,6 @@ struct CodeView: View {
         }
         
     }
-    fileprivate var edittingView: some View {
-        VStack {
-            Divider()
-            HStack(alignment: .center) {
-                Button(action: {
-                    if self.isCodeSelectAll {
-                        self.codeSelection.removeAll()
-                    } else {
-                        self.codeSelection = Set(self.codes.map(\.id))
-                    }
-                }) { Text(isCodeSelectAll ? "全不选" : "全选").padding() }
-
-                Spacer()
-                Button(action: {
-                    let items = self.codes.filter {
-                        self.codeSelection.contains($0.id)
-                    }
-                    self.askDel(items: items)
-                }) { Text("删除").padding() }
-                .foregroundColor(codeSelection.isEmpty ? .gray : .red)
-                .disabled(codeSelection.isEmpty)
-            }
-        }
-    }
-    fileprivate func cell(_ model: CodeModel) -> some View {
-        let code = isEditting ? nil : self.totpManager.currentCode[model.secretKey ?? ""]
-        let data = (model.account ?? "", model.secretKey ?? "", model.remark ?? "")
-        let v = CodeCell(data: data, code: code?.displayCodeString ?? "--- ---")
-        
-        if isEditting {
-            return AnyView(v).listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-        }
-        
-        return AnyView(
-            v.contextMenu {
-                Button(action: { self.copy(code: code) }) {
-                    Text("复制")
-                    Image(systemName: "doc.on.doc")
-                }
-                Button(action: { self.codeQRState = .show(code: model) }) {
-                    Text("二维码")
-                    Image(systemName: "qrcode")
-                }
-                Button(action: {
-                    self.codeEditState = .edit(code: model)
-                }) {
-                    Text("编辑")
-                    Image(systemName: "pencil")
-                }
-                Button(action: { self.askDel(items: [model]) }) {
-                    Text("删除")
-                    Image(systemName: "trash")
-                }
-            }
-            // FIXME: - 点击右边空白处死活不触发, 只能点Text部分
-            .onTapGesture {
-                self.copy(code: code)
-            }
-            .sheet(isPresented: $codeQRState.isShow) {
-                self.codeQRState.view
-            }
-        )
-        .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-    }
-    
-    var codeView: some View {
-        List(selection: $codeSelection) {
-            ForEach(codes, id: \.id) { model in
-                VStack(alignment: .leading, spacing: 0) {
-                    self.cell(model)
-                    Divider()
-                }.listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
-            }
-            .onMove { from, to in
-                guard let f = from.last, f != to else {
-                    return
-                }
-                self.moveCode(from: f, to: to)
-            }
-            .onDelete { item in
-                self.askDel(items: item.map { self.codes[$0] })
-            }
-        }
-        .listStyle(PlainListStyle())
-        .environment(\.editMode, .constant(isEditting ? .active : .inactive))
-        .modifier(ListSeparatorNoneViewModifier())
-    }
     
     var body: some View {
         NavigationView {
@@ -253,34 +96,22 @@ struct CodeView: View {
                     .navigationBarTitle("扫描二维码"), isActive: $isShowScanView) {
                     EmptyView()
                 }
-
+                
                 if !codes.isEmpty {
                     TimeProgressView()
-                    codeView
-                } else {
-                    Spacer()
-                    Text(isEditting ? "暂无数据" : "点击右上角添加数据")
+                    TextField("搜索关键字", text: $kw)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding()
                 }
                 
-                if codes.isEmpty {
-                    Spacer()
-                }
-                
-                if isEditting {
-                    edittingView
-                }
+                CodeList(kw: kw, isEditting: $isEditting)
             }
             .edgesIgnoringSafeArea(isEditting ? .bottom : .init())
             .navigationBarTitle("验证码", displayMode: .inline)
             .navigationBarItems(leading: leadingBarItems, trailing: trailingBatItems)
         }
-        .alert(isPresented: $isShowDelAlert, content: { () -> Alert in
-            Alert(title: Text("删除后不可恢复, 是否删除?"), primaryButton: Alert.Button.destructive(Text("删除")) {
-                self.realDel()
-            }, secondaryButton: Alert.Button.default(Text("取消")))
-        })
-        .sheet(isPresented: $codeEditState.isShow) {
-            self.codeEditState.view
+        .sheet(isPresented: $codeEditShowState.isShow) {
+            self.codeEditShowState.view
                 .environment(\.managedObjectContext, self.moc)
         }
     }
@@ -311,7 +142,7 @@ struct CodeView: View {
         do {
             let ds = try TOTP.parseURL(str)
             DispatchQueue.main.async {
-                self.codeEditState = .add(params: ds)
+                self.codeEditShowState = .add(params: ds)
             }
         } catch let error as TOTP.ParseError {
             switch error {
@@ -324,46 +155,6 @@ struct CodeView: View {
             }
         } catch {
             HUD.showTextOnWin("解析错误")
-        }
-    }
-    
-    fileprivate func copy(code: Int?) {
-        UIPasteboard.general.string = code?.codeString ?? ""
-        HUD.showTextOnWin("复制成功")
-    }
-    
-    fileprivate func moveCode(from: Int, to: Int) {
-        if to == 0 {
-            codes[from].score = codes[to].score - 4
-        } else if to == codes.count {
-            codes[from].score = codes[to - 1].score + 4
-        } else {
-            codes[from].score = (codes[to - 1].score + codes[to].score) / 2
-        }
-        
-        do {
-            try moc.save()
-        } catch {
-            HUD.showTextOnWin("操作失败, 数据库发生错误")
-        }
-    }
-    
-    fileprivate func askDel(items: [CodeModel]) {
-        willDelCodes = items
-        isShowDelAlert = true
-    }
-    
-    fileprivate func realDel() {
-        let objIDs = willDelCodes.map(\.objectID)
-        willDelCodes.removeAll()
-        let req = NSBatchDeleteRequest(objectIDs: objIDs)
-        req.resultType = .resultTypeObjectIDs
-        
-        do {
-            try moc.execute(req)
-            NSManagedObjectContext.mergeChanges(fromRemoteContextSave: [NSDeletedObjectsKey: objIDs], into: [moc])
-        } catch {
-            HUD.showTextOnWin("操作失败, 数据库发生错误")
         }
     }
 }

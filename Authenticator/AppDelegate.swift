@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     lazy var window: UIWindow? = UIWindow(frame: UIScreen.main.bounds)
     
-    fileprivate var frc: NSFetchedResultsController<NSFetchRequestResult>?
+    fileprivate var frc: NSFetchedResultsController<CodeModel>?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
@@ -34,12 +34,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // Core Data
         let ctx = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-        let fReq = NSFetchRequest<NSFetchRequestResult>(entityName: CodeModel.entity().name ?? "")
+        let fReq = NSFetchRequest<CodeModel>(entityName: CodeModel.name)
         fReq.sortDescriptors = [NSSortDescriptor(key: "score", ascending: true)]
         frc = NSFetchedResultsController(fetchRequest: fReq, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
         frc?.delegate = self
         
-        if let _ = try? frc?.performFetch(), let codes = frc?.fetchedObjects as? [CodeModel] {
+        if let _ = try? frc?.performFetch(), let codes = frc?.fetchedObjects {
             TOTPManager.shared.secretKeys = codes.compactMap(\.secretKey)
         }
         
@@ -115,7 +115,7 @@ extension AppDelegate: WCSessionDelegate {
         guard case .activated = activationState else {
             return
         }
-        guard let _ = try? frc?.performFetch(), let codes = frc?.fetchedObjects as? [CodeModel] else {
+        guard let _ = try? frc?.performFetch(), let codes = frc?.fetchedObjects else {
             return
         }
         pushToWatch(codes: codes)

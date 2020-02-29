@@ -13,9 +13,6 @@ struct CodeEditView: View {
     @Environment(\.managedObjectContext) fileprivate var moc
     @Environment(\.presentationMode) fileprivate var presentationMode
     
-    @State fileprivate var isShowErrMsg = false
-    @State fileprivate var isShowExistSKMsg = false
-    
     @State fileprivate var account: String
     @State fileprivate var secretKey: String
     @State fileprivate var remark: String
@@ -82,19 +79,13 @@ struct CodeEditView: View {
                 }
                 Spacer()
             }
-            .alert(isPresented: $isShowErrMsg, content: { () -> Alert in
-                Alert(title: Text("操作失败, 数据库发生错误"))
-            })
-            .alert(isPresented: $isShowExistSKMsg, content: { () -> Alert in
-                Alert(title: Text("该秘钥已存在"))
-            })
             .navigationBarTitle(isAddModel ? "添加验证码" : "编辑验证码", displayMode: .inline)
             .navigationBarItems(leading: leadingBarItems)
         }
     }
     
     fileprivate func checkSecretKeyIsExist() throws -> Bool {
-        let fReq = NSFetchRequest<NSFetchRequestResult>(entityName: "Code")
+        let fReq = NSFetchRequest<CodeModel>(entityName: CodeModel.name)
         fReq.predicate = NSPredicate(format: "secretKey == %@", secretKey)
         return try moc.count(for: fReq) != 0
     }
@@ -104,7 +95,7 @@ struct CodeEditView: View {
             if let code = code {
                 if code.secretKey != secretKey.uppercased() {
                     guard !(try checkSecretKeyIsExist()) else {
-                        isShowExistSKMsg = true
+                        HUD.showTextOnWin("该秘钥已存在")
                         return
                     }
                     code.secretKey = secretKey.uppercased()
@@ -114,17 +105,14 @@ struct CodeEditView: View {
                 code.remark = remark
             } else {
                 guard !(try checkSecretKeyIsExist()) else {
-                    isShowExistSKMsg = true
+                    HUD.showTextOnWin("该秘钥已存在")
                     return
                 }
                 
-                let fReq = NSFetchRequest<NSFetchRequestResult>(entityName: "Code")
+                let fReq = NSFetchRequest<CodeModel>(entityName: CodeModel.name)
                 fReq.sortDescriptors = [NSSortDescriptor(keyPath: \CodeModel.score, ascending: false)]
                 fReq.fetchLimit = 1
-                guard let fRes = try moc.fetch(fReq) as? [CodeModel] else {
-                    isShowErrMsg = true
-                    return
-                }
+                let fRes = try moc.fetch(fReq)
 
                 let m = CodeModel(context: moc)
                 m.id = UUID()
@@ -137,7 +125,7 @@ struct CodeEditView: View {
             
             self.presentationMode.wrappedValue.dismiss()
         } catch {
-            isShowErrMsg = true
+            HUD.showTextOnWin("操作失败, 数据库发生错误")
         }
     }
 }
