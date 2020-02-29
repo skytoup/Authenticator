@@ -24,11 +24,15 @@ struct CodeCell: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading) {
-            Text(data.issuer)
-            codeText
-            Text(data.remark)
-        }.padding()
+        HStack {
+            VStack(alignment: .leading) {
+                Text(data.issuer)
+                codeText
+                Text(data.remark)
+            }
+            .padding()
+            Spacer()
+        }
     }
 }
 

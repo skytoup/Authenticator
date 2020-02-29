@@ -99,7 +99,6 @@ struct CodeList: View {
                     Image(systemName: "trash")
                 }
             }
-            // FIXME: - 点击右边空白处死活不触发, 只能点Text部分
             .onTapGesture {
                 self.copy(code: code)
             }
