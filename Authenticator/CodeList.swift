@@ -99,6 +99,7 @@ struct CodeList: View {
                     Image(systemName: "trash")
                 }
             }
+            .contentShape(Rectangle())
             .onTapGesture {
                 self.copy(code: code)
             }
