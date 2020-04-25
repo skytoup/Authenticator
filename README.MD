@@ -1,5 +1,6 @@
 # 验证器(Authenticator)
 > `GoogleAuthenticator` TOTP部分实现的验证器(没有实现HOTP)
+> 
 > 已上架AppStore, 可直接下载体验: <itms-apps://itunes.apple.com/app/id1509275023>
 
 由于`GoogleAuthenticator`没有导出功能, 而且在watch上也没有查看功能, 干脆自己实现一个
