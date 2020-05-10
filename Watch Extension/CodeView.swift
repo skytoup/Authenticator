@@ -11,15 +11,8 @@ import SwiftUI
 import Combine
 
 struct CodeView: View {
-    // 如果不是每次创建, 显示空视图之后, 计时器会不启动
-    fileprivate var timer: Publishers.Autoconnect<Timer.TimerPublisher> {
-        Timer.publish(every: 1/30, on: .main, in: .common).autoconnect()
-    }
-
-    @State fileprivate var ts: TimeInterval = 0
-    @ObservedObject fileprivate var dataManager = DataManager.shared
-    @ObservedObject fileprivate var totpManager = TOTPManager.shared
     
+    // MARK: - view
     @ViewBuilder
     var body: some View {
         if dataManager.datas.isEmpty {
@@ -28,11 +21,19 @@ struct CodeView: View {
             VStack {
                 TimeProgressView()
                 List(dataManager.datas, id: \.secretKey) { data in
-                    CodeCell(data: data, code: self.totpManager.currentCode[data.secretKey]?.displayCodeString ?? "--- ---")
+                    CodeCell(data: data, code: self.totpManager.currentCode[data.secretKey]?.displayCodeString ?? "--- ---", isRefreshSoon: self.isRefreshSoon)
                 }
+            }.onReceive(MyTimer.shared.$ts.map { $0 <= 5 }) {
+                self.isRefreshSoon = $0
             }
         }
     }
+    
+    // MARK: - property
+    @ObservedObject fileprivate var dataManager = DataManager.shared
+    @ObservedObject fileprivate var totpManager = TOTPManager.shared
+    
+    @State fileprivate var isRefreshSoon = false
 
 }
 

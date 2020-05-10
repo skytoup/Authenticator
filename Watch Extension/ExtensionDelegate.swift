@@ -67,4 +67,8 @@ extension ExtensionDelegate: WCSessionDelegate {
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         DataManager.shared.handle(datas: applicationContext)
     }
+    
+    func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+        DataManager.shared.handle(datas: message)
+    }
 }

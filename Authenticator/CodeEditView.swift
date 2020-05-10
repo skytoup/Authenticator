@@ -10,6 +10,48 @@ import SwiftUI
 import CoreData
 
 struct CodeEditView: View {
+    // MARK: - view
+    var body: some View {
+        NavigationView {
+            VStack {
+                Spacer().frame(height: 15)
+                ForEach([
+                    ("账 号", "必填, 50字符内", $account),
+                    ("秘 钥", "必填, 128字符内", $secretKey),
+                    ("备 注", "可空, 50字符内", $remark),
+                ], id: \.0) { ds in
+                    VStack(alignment: .leading) {
+                        Text(ds.0)
+                            .font(.system(size: 20, weight: .bold))
+                        MarkedTextField(ds.1, text: ds.2)
+                    }
+                    .padding(.horizontal, 15)
+                }
+                
+                VStack(alignment: .center) {
+                    Button(action: { self.saveOrAdd() }) {
+                        Text(isAddModel ? "添 加" : "保 存")
+                            .font(.system(size: 18))
+                    }
+                    .disabled(!isCanSaveOrAdd)
+                    .padding()
+                }
+                Spacer()
+            }
+            .navigationBarTitle(isAddModel ? "添加验证码" : "编辑验证码", displayMode: .inline)
+            .navigationBarItems(leading: leadingBarItems)
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+    }
+    
+    fileprivate var leadingBarItems: some View {
+        Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+        }) { Text("取消") }
+            .padding([.vertical, .trailing], 20)
+    }
+    
+    // MARK: - property
     @Environment(\.managedObjectContext) fileprivate var moc
     @Environment(\.presentationMode) fileprivate var presentationMode
     
@@ -34,12 +76,6 @@ struct CodeEditView: View {
         _remark = .init(initialValue: params?.remark ?? "")
     }
     
-    fileprivate var leadingBarItems: some View {
-        Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-        }) { Text("取消") }
-            .padding([.vertical, .trailing], 20)
-    }
     fileprivate var isCanSaveOrAdd: Bool {
         let base32CharSet = CharacterSet(charactersIn: "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567")
         guard (1...50).contains(account.count),
@@ -49,39 +85,6 @@ struct CodeEditView: View {
             return false
         }
         return true
-    }
-    
-    var body: some View {
-        NavigationView {
-            VStack {
-                Spacer().frame(height: 15)
-                ForEach([
-                    ("账 号", "必填, 50字符内", $account),
-                    ("秘 钥", "必填, 128字符内", $secretKey),
-                    ("备 注", "可空, 50字符内", $remark),
-                ], id: \.0) { ds in
-                    VStack(alignment: .leading) {
-                        Text(ds.0)
-                            .font(.system(size: 20, weight: .bold))
-                        TextField(ds.1, text: ds.2)
-                            .textFieldStyle(RoundedBorderTextFieldStyle())
-                    }
-                    .padding(.horizontal, 15)
-                }
-                
-                VStack(alignment: .center) {
-                    Button(action: { self.saveOrAdd() }) {
-                        Text(isAddModel ? "添 加" : "保 存")
-                            .font(.system(size: 18))
-                    }
-                    .disabled(!isCanSaveOrAdd)
-                    .padding()
-                }
-                Spacer()
-            }
-            .navigationBarTitle(isAddModel ? "添加验证码" : "编辑验证码", displayMode: .inline)
-            .navigationBarItems(leading: leadingBarItems)
-        }
     }
     
     fileprivate func checkSecretKeyIsExist() throws -> Bool {
@@ -128,6 +131,7 @@ struct CodeEditView: View {
             HUD.showTextOnWin("操作失败, 数据库发生错误")
         }
     }
+    
 }
 
 struct CodeEditView_Previews: PreviewProvider {

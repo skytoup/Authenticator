@@ -10,9 +10,7 @@ import SwiftUI
 import Combine
 
 struct TimeProgressView: View {
-    // FIXME: - Xcode 11.4 beta 2 编译Timer.publisher和NavigationView嵌套多层使用有问题
-    @ObservedObject fileprivate var myTimer = MyTimer.shared
-    
+    // MARK: - view
     var body: some View {
         GeometryReader { metry in
             Color(.gray)
@@ -21,6 +19,10 @@ struct TimeProgressView: View {
         }
         .frame(height: 2)
     }
+    
+    // MARK: - property
+    @ObservedObject fileprivate var myTimer = MyTimer.shared
+    
 }
 
 struct TimeProgressView_Previews: PreviewProvider {

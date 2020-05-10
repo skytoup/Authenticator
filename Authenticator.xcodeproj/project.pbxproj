@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 51;
+	objectVersion = 50;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -11,6 +11,11 @@
 		180578EE2400048F00C9CFA8 /* CodeEditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180578ED2400048E00C9CFA8 /* CodeEditView.swift */; };
 		180578F02400ED3F00C9CFA8 /* TimeProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180578EF2400ED3F00C9CFA8 /* TimeProgressView.swift */; };
 		180579122401093800C9CFA8 /* MyTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180579112401093800C9CFA8 /* MyTimer.swift */; };
+		180DC51724678F1D0082D8EF /* AppManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180DC51624678F1D0082D8EF /* AppManager.swift */; };
+		180DC51924678F720082D8EF /* LocalAuth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180DC51824678F720082D8EF /* LocalAuth.swift */; };
+		180DC51B24678F940082D8EF /* MarkedTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180DC51A24678F940082D8EF /* MarkedTextField.swift */; };
+		180DC51D24678FBB0082D8EF /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180DC51C24678FBB0082D8EF /* SettingView.swift */; };
+		180DC51F24678FF80082D8EF /* SettingItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 180DC51E24678FF80082D8EF /* SettingItemView.swift */; };
 		181318C42352046300BED3AB /* Authenticator.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 189248312342F9A3002DFDAA /* Authenticator.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		18226A7C233FAA6300B10142 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18226A7B233FAA6300B10142 /* AppDelegate.swift */; };
 		18226A7E233FAA6300B10142 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18226A7D233FAA6300B10142 /* SceneDelegate.swift */; };
@@ -112,6 +117,11 @@
 		180578ED2400048E00C9CFA8 /* CodeEditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeEditView.swift; sourceTree = "<group>"; };
 		180578EF2400ED3F00C9CFA8 /* TimeProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeProgressView.swift; sourceTree = "<group>"; };
 		180579112401093800C9CFA8 /* MyTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTimer.swift; sourceTree = "<group>"; };
+		180DC51624678F1D0082D8EF /* AppManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppManager.swift; sourceTree = "<group>"; };
+		180DC51824678F720082D8EF /* LocalAuth.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalAuth.swift; sourceTree = "<group>"; };
+		180DC51A24678F940082D8EF /* MarkedTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkedTextField.swift; sourceTree = "<group>"; };
+		180DC51C24678FBB0082D8EF /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
+		180DC51E24678FF80082D8EF /* SettingItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingItemView.swift; sourceTree = "<group>"; };
 		18226A78233FAA6300B10142 /* Authenticator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Authenticator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		18226A7B233FAA6300B10142 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		18226A7D233FAA6300B10142 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -232,15 +242,18 @@
 				18226A89233FAA6400B10142 /* Info.plist */,
 				180578DF23FFD58300C9CFA8 /* CodeModel.xcdatamodeld */,
 				18C54B5723FFA5D40036317F /* CodeView.swift */,
+				184666EC24091BD400776076 /* CodeList.swift */,
 				18FD676E23FCDB6000F65096 /* CodeCell.swift */,
 				180578ED2400048E00C9CFA8 /* CodeEditView.swift */,
 				18CAD2FA24066C9C0086BB32 /* CodeQRView.swift */,
+				180DC51C24678FBB0082D8EF /* SettingView.swift */,
+				180DC51E24678FF80082D8EF /* SettingItemView.swift */,
 				180578EF2400ED3F00C9CFA8 /* TimeProgressView.swift */,
-				180579112401093800C9CFA8 /* MyTimer.swift */,
 				18CAD2F8240652E70086BB32 /* ImagePicker.swift */,
+				180DC51A24678F940082D8EF /* MarkedTextField.swift */,
 				18CAD2FE240678FA0086BB32 /* LBXScan.swift */,
+				180579112401093800C9CFA8 /* MyTimer.swift */,
 				18C1910C23FFB3650014EB17 /* ListSeparatorNoneViewModifier.swift */,
-				184666EC24091BD400776076 /* CodeList.swift */,
 				184666EE240A0CAE00776076 /* ShowStateProtocol.swift */,
 				184666F0240A0CCB00776076 /* CodeQRShowState.swift */,
 				184666F2240A0D0B00776076 /* CodeEditShowState.swift */,
@@ -302,6 +315,8 @@
 				18CECD1F23497A9E009B802A /* HUD.swift */,
 				18AA870D234A3EA900FF4F6A /* SafeDispatch.swift */,
 				18CAD2FC2406758E0086BB32 /* ImgSaver.swift */,
+				180DC51624678F1D0082D8EF /* AppManager.swift */,
+				180DC51824678F720082D8EF /* LocalAuth.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -521,6 +536,7 @@
 				1892485E2345F4DF002DFDAA /* Base32.swift in Sources */,
 				18AA870E234A3EA900FF4F6A /* SafeDispatch.swift in Sources */,
 				18C1910D23FFB3650014EB17 /* ListSeparatorNoneViewModifier.swift in Sources */,
+				180DC51724678F1D0082D8EF /* AppManager.swift in Sources */,
 				18C54B5823FFA5D40036317F /* CodeView.swift in Sources */,
 				18CAD2F9240652E70086BB32 /* ImagePicker.swift in Sources */,
 				188C5CEA234835A00024BECB /* TOTPManager.swift in Sources */,
@@ -533,10 +549,14 @@
 				188C5CD0234718E60024BECB /* String+Base32.swift in Sources */,
 				18226A7C233FAA6300B10142 /* AppDelegate.swift in Sources */,
 				184666F3240A0D0B00776076 /* CodeEditShowState.swift in Sources */,
+				180DC51F24678FF80082D8EF /* SettingItemView.swift in Sources */,
 				184666F1240A0CCB00776076 /* CodeQRShowState.swift in Sources */,
 				184666EF240A0CAE00776076 /* ShowStateProtocol.swift in Sources */,
+				180DC51D24678FBB0082D8EF /* SettingView.swift in Sources */,
 				18226A7E233FAA6300B10142 /* SceneDelegate.swift in Sources */,
 				188C5CEC234850EF0024BECB /* Int+Code.swift in Sources */,
+				180DC51B24678F940082D8EF /* MarkedTextField.swift in Sources */,
+				180DC51924678F720082D8EF /* LocalAuth.swift in Sources */,
 				188C5CE423476E980024BECB /* TOTP.swift in Sources */,
 				18CECD2023497A9E009B802A /* HUD.swift in Sources */,
 				184666ED24091BD400776076 /* CodeList.swift in Sources */,
@@ -736,7 +756,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_TEAM = ED4MS6929N;
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -744,12 +764,12 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sky.Authenticator;
 				PRODUCT_NAME = Authenticator;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7s arm64e";
 			};
 			name = Debug;
@@ -763,7 +783,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = NO;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 35;
 				DEVELOPMENT_TEAM = ED4MS6929N;
 				INFOPLIST_FILE = Authenticator/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -771,12 +791,12 @@
 					"@executable_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.6;
 				PRODUCT_BUNDLE_IDENTIFIER = com.sky.Authenticator;
 				PRODUCT_NAME = Authenticator;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALID_ARCHS = "arm64 armv7s arm64e";
 			};
 			name = Release;

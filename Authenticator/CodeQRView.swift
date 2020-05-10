@@ -9,20 +9,7 @@
 import SwiftUI
 
 struct CodeQRView: View {
-    
-    let code: CodeModel
-    
-    @Environment(\.presentationMode) fileprivate var presentationMode
-    
-    @State fileprivate var qrImg: UIImage?
-    
-    fileprivate var trailingBarItems: some View {
-        Button(action: {
-            self.presentationMode.wrappedValue.dismiss()
-        }) { Text("关闭") }
-        .padding([.vertical, .leading], 20)
-    }
-    
+    // MARK: - view
     var body: some View {
         NavigationView {
             VStack {
@@ -31,7 +18,7 @@ struct CodeQRView: View {
                 if qrImg == nil {
                      Text("加载中...")
                 } else {
-                    Image(uiImage: qrImg!)
+                    Image(uiImage: qrImg!).resizable().aspectRatio(contentMode: .fit).padding()
                 }
                 
                 Spacer()
@@ -41,13 +28,13 @@ struct CodeQRView: View {
                     if !(code.remark?.isEmpty ?? true) {
                         Text(code.remark!)
                     }
-                    
-                    Button(action: {
-                        self.saveQRImg()
-                    }) { Text("保存二维码") }
-                        .padding()
-                        .disabled(qrImg == nil)
                 }
+                
+                Button(action: {
+                    self.saveQRImg()
+                }) { Text("保存二维码") }
+                    .padding()
+                    .disabled(qrImg == nil)
             }
             .navigationBarItems(trailing: trailingBarItems)
             .navigationBarTitle("验证码二维码", displayMode: .inline)
@@ -57,7 +44,23 @@ struct CodeQRView: View {
                 self.genQRImg(str: urlStr)
             }
         }
+        .navigationViewStyle(StackNavigationViewStyle())
     }
+    
+    fileprivate var trailingBarItems: some View {
+        Button(action: {
+            self.presentationMode.wrappedValue.dismiss()
+        }) { Text("关闭") }
+        .padding([.vertical, .leading], 20)
+    }
+    
+    // MARK: - property
+    
+    @Environment(\.presentationMode) fileprivate var presentationMode
+    
+    @State fileprivate var qrImg: UIImage?
+    
+    let code: CodeModel
     
     fileprivate func saveQRImg() {
         guard let img = qrImg else {
@@ -105,6 +108,7 @@ struct CodeQRView: View {
             }
         }
     }
+
 }
 
 struct CodeQRView_Previews: PreviewProvider {

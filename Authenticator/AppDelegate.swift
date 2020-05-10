@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         
         // Core Data
-        let ctx = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+        let ctx = persistentContainer.viewContext
         let fReq = NSFetchRequest<CodeModel>(entityName: CodeModel.name)
         fReq.sortDescriptors = [NSSortDescriptor(key: "score", ascending: true)]
         frc = NSFetchedResultsController(fetchRequest: fReq, managedObjectContext: ctx, sectionNameKeyPath: nil, cacheName: nil)
@@ -109,7 +109,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 // MARK: - WCSessionDelegate
 extension AppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-        guard let _ = error else {
+        guard error == nil else {
             return
         }
         guard case .activated = activationState else {
@@ -118,7 +118,9 @@ extension AppDelegate: WCSessionDelegate {
         guard let _ = try? frc?.performFetch(), let codes = frc?.fetchedObjects else {
             return
         }
-        pushToWatch(codes: codes)
+        
+        let ds = codes.map { $0.dictionaryWithValues(forKeys: ["account", "secretKey", "remark"]) }
+        session.sendMessage(["datas": ds, "ver": "v1"], replyHandler: nil, errorHandler: nil)
     }
     
     func sessionDidBecomeInactive(_ session: WCSession) {

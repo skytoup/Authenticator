@@ -6,15 +6,8 @@ abstract_target 'App' do
 	  # Comment the next line if you don't want to use dynamic frameworks
 	  # use_frameworks!
 
-	  # Pods for Authenticator
-	#  pod 'SnapKit', '~> 5.0.0'
-	  
-	#  pod 'ReactiveCocoa', '~> 9.0'
-	#  pod 'ReactiveSwift', '~> 5.0'
-	  
-	#  pod 'Realm', '~>3.19.0'
-	#  pod 'RealmSwift', '~>3.19.0'
-	  
+    pod 'SimpleStoreData', '~> 0.1.0'
+    
 	  pod 'IQKeyboardManagerSwift'
 	  
 	  pod 'MBProgressHUD', '~> 1.1.0', :modular_headers => true
